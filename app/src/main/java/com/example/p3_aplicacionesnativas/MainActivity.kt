@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable // Importar
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var currentTheme by remember { mutableStateOf(AppTheme.Default) }
+            var currentTheme by rememberSaveable { mutableStateOf(AppTheme.Default) }
 
             val theme: @Composable (content: @Composable () -> Unit) -> Unit = when (currentTheme) {
                 AppTheme.Guinda -> { content -> GuindaTheme { content() } }

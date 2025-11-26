@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.webkit.MimeTypeMap
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -75,6 +76,18 @@ fun FileManagerScreen(
             hasPermission = isGranted
         }
     )
+
+    // CORRECCIÓN: Manejar botón atrás
+    // Si la ruta actual NO es la raíz del almacenamiento externo, "volver" significa subir un nivel.
+    val rootPath = android.os.Environment.getExternalStorageDirectory().absolutePath
+    val isAtRoot = currentPath == rootPath
+
+    BackHandler(enabled = !isAtRoot) {
+        val parentFile = File(currentPath).parentFile
+        if (parentFile != null && parentFile.exists()) {
+            viewModel.loadFiles(parentFile.absolutePath)
+        }
+    }
 
     LaunchedEffect(hasPermission) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
