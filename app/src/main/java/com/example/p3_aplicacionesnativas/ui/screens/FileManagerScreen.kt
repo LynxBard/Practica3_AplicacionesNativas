@@ -76,10 +76,12 @@ fun FileManagerScreen(
     var operationMessage by remember { mutableStateOf<String?>(null) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            viewModel.updatePermissionStatus(isGranted)
-            if (isGranted) {
+        contract = ActivityResultContracts.RequestMultiplePermissions(), // CAMBIO AQUÍ
+        onResult = { permissions ->
+            // Verificamos si todos los permisos fueron otorgados
+            val allGranted = permissions.values.all { it }
+            viewModel.updatePermissionStatus(allGranted)
+            if (allGranted) {
                 viewModel.loadFiles()
             }
         }
@@ -294,7 +296,13 @@ fun FileManagerScreen(
                             intent.data = Uri.parse("package:${context.packageName}")
                             context.startActivity(intent)
                         } else {
-                            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                            // Android 10 e inferiores: Pedimos ambos permisos
+                            permissionLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                )
+                            )
                         }
                     }
                 )

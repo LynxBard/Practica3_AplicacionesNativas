@@ -37,12 +37,21 @@ class FileManagerViewModel : ViewModel() {
     // Función para verificar y actualizar permisos
     fun checkAndUpdatePermissions(context: Context) {
         val permissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+: Usa el permiso especial de MANAGE_EXTERNAL_STORAGE
             Environment.isExternalStorageManager()
         } else {
-            ContextCompat.checkSelfPermission(
+            // Android 10 e inferiores: Requieren LECTURA y ESCRITURA explícitas
+            val hasRead = ContextCompat.checkSelfPermission(
                 context,
                 android.Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
+
+            val hasWrite = ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+
+            hasRead && hasWrite
         }
 
         // Solo actualizar si hay cambio en el estado
