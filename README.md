@@ -1,7 +1,6 @@
-﻿# Practica3_AplicacionesNativas
 -----
 
-# Practica 3 - Explorador de Archivos (Aplicaciones Nativas)
+# Gestor de Archivos Para Android
 
 Una aplicación nativa de Android desarrollada en Kotlin utilizando **Jetpack Compose**. Esta herramienta funciona como un explorador de archivos completo que permite navegar, gestionar y visualizar diferentes tipos de documentos en el almacenamiento del dispositivo, con soporte avanzado para temas personalizados.
 
@@ -82,3 +81,4 @@ La aplicación solicita los siguientes permisos para funcionar correctamente:
   * `MANAGE_EXTERNAL_STORAGE` (Para Android 11+)
 
 -----
+
