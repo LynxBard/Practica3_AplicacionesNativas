@@ -7,14 +7,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext // Importante agregar este import
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.p3_aplicacionesnativas.data.SettingsManager // Importar tu nueva clase
 import com.example.p3_aplicacionesnativas.ui.screens.*
 import com.example.p3_aplicacionesnativas.ui.theme.AppTheme
 import com.example.p3_aplicacionesnativas.ui.theme.AzulTheme
@@ -30,13 +33,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var currentTheme by rememberSaveable { mutableStateOf(AppTheme.Default) }
+            val context = LocalContext.current
+            val settingsManager = remember { SettingsManager(context) }
+            var currentTheme by remember { mutableStateOf(settingsManager.getTheme()) }
+            val changeThemeAndSave = { newTheme: AppTheme ->
+                currentTheme = newTheme
+                settingsManager.saveTheme(newTheme)
+            }
 
             // Aplicar el tema seleccionado
             when (currentTheme) {
-                AppTheme.Guinda -> GuindaTheme { AppContent(onThemeChange = { currentTheme = it }) }
-                AppTheme.Azul -> AzulTheme { AppContent(onThemeChange = { currentTheme = it }) }
-                AppTheme.Default -> P3_AplicacionesNativasTheme { AppContent(onThemeChange = { currentTheme = it }) }
+                AppTheme.Guinda -> GuindaTheme { AppContent(onThemeChange = changeThemeAndSave) }
+                AppTheme.Azul -> AzulTheme { AppContent(onThemeChange = changeThemeAndSave) }
+                AppTheme.Default -> P3_AplicacionesNativasTheme { AppContent(onThemeChange = changeThemeAndSave) }
             }
         }
     }
