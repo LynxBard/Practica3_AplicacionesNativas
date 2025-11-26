@@ -5,3 +5,10 @@ enum class AppTheme {
     Guinda,
     Azul
 }
+
+// Nuevo Enum para el modo
+enum class ThemeMode {
+    Light,  // Claro
+    Dark,   // Oscuro
+    System  // Sistema
+}

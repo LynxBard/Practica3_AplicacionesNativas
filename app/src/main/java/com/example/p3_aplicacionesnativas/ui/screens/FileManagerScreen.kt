@@ -46,12 +46,14 @@ import com.example.p3_aplicacionesnativas.viewmodel.FileManagerViewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import com.example.p3_aplicacionesnativas.ui.theme.ThemeMode // Importar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FileManagerScreen(
     viewModel: FileManagerViewModel,
     onThemeChange: (AppTheme) -> Unit,
+    onModeChange: (ThemeMode) -> Unit, // Nuevo parámetro
     onFileClick: (File) -> Unit,
     onImageClick: (File) -> Unit,
     onJsonXmlClick: (File) -> Unit
@@ -164,6 +166,7 @@ fun FileManagerScreen(
                                 expanded = showMenu,
                                 onDismissRequest = { showMenu = false }
                             ) {
+                                Text("Estilo", modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall)
                                 DropdownMenuItem(
                                     text = { Text("Tema Guinda") },
                                     onClick = {
@@ -184,6 +187,24 @@ fun FileManagerScreen(
                                         onThemeChange(AppTheme.Default)
                                         showMenu = false
                                     }
+                                )
+                                HorizontalDivider()
+                                // Sección de Modos
+                                Text("Modo", modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall)
+                                DropdownMenuItem(
+                                    text = { Text("Claro") },
+                                    onClick = { onModeChange(ThemeMode.Light); showMenu = false },
+                                    leadingIcon = { Icon(Icons.Default.LightMode, contentDescription = null) }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Oscuro") },
+                                    onClick = { onModeChange(ThemeMode.Dark); showMenu = false },
+                                    leadingIcon = { Icon(Icons.Default.DarkMode, contentDescription = null) }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Sistema") },
+                                    onClick = { onModeChange(ThemeMode.System); showMenu = false },
+                                    leadingIcon = { Icon(Icons.Default.SettingsSuggest, contentDescription = null) }
                                 )
                             }
                         }
