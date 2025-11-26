@@ -7,8 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable // Importar
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -34,40 +33,42 @@ class MainActivity : ComponentActivity() {
         setContent {
             var currentTheme by rememberSaveable { mutableStateOf(AppTheme.Default) }
 
-            val theme: @Composable (content: @Composable () -> Unit) -> Unit = when (currentTheme) {
-                AppTheme.Guinda -> { content -> GuindaTheme { content() } }
-                AppTheme.Azul -> { content -> AzulTheme { content() } }
-                else -> { content -> P3_AplicacionesNativasTheme { content() } }
+            // Aplicar el tema seleccionado
+            when (currentTheme) {
+                AppTheme.Guinda -> GuindaTheme { AppContent(onThemeChange = { currentTheme = it }) }
+                AppTheme.Azul -> AzulTheme { AppContent(onThemeChange = { currentTheme = it }) }
+                AppTheme.Default -> P3_AplicacionesNativasTheme { AppContent(onThemeChange = { currentTheme = it }) }
             }
+        }
+    }
+}
 
-            theme {
-                val navController = rememberNavController()
-                val viewModel: FileManagerViewModel = viewModel()
+@Composable
+private fun AppContent(onThemeChange: (AppTheme) -> Unit) {
+    val navController = rememberNavController()
+    val viewModel: FileManagerViewModel = viewModel()
 
-                NavHost(navController = navController, startDestination = "file_manager") {
-                    composable("file_manager") {
-                        FileManagerScreen(
-                            viewModel = viewModel,
-                            onThemeChange = { newTheme -> currentTheme = newTheme },
-                            onFileClick = {
-                                val encodedPath = URLEncoder.encode(it.absolutePath, StandardCharsets.UTF_8.toString())
-                                navController.navigate("text_viewer/$encodedPath")
-                            }
-                        )
-                    }
-                    composable(
-                        route = "text_viewer/{filePath}",
-                        arguments = listOf(navArgument("filePath") { type = NavType.StringType })
-                    ) {
-                        val filePath = it.arguments?.getString("filePath") ?: ""
-                        TextFileViewerScreen(
-                            filePath = URLDecoder.decode(filePath, StandardCharsets.UTF_8.toString()),
-                            viewModel = viewModel,
-                            onNavigateUp = { navController.popBackStack() }
-                        )
-                    }
+    NavHost(navController = navController, startDestination = "file_manager") {
+        composable("file_manager") {
+            FileManagerScreen(
+                viewModel = viewModel,
+                onThemeChange = onThemeChange,
+                onFileClick = {
+                    val encodedPath = URLEncoder.encode(it.absolutePath, StandardCharsets.UTF_8.toString())
+                    navController.navigate("text_viewer/$encodedPath")
                 }
-            }
+            )
+        }
+        composable(
+            route = "text_viewer/{filePath}",
+            arguments = listOf(navArgument("filePath") { type = NavType.StringType })
+        ) {
+            val filePath = it.arguments?.getString("filePath") ?: ""
+            TextFileViewerScreen(
+                filePath = URLDecoder.decode(filePath, StandardCharsets.UTF_8.toString()),
+                viewModel = viewModel,
+                onNavigateUp = { navController.popBackStack() }
+            )
         }
     }
 }
