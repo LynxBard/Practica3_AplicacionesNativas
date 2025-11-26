@@ -15,8 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.p3_aplicacionesnativas.ui.screens.FileManagerScreen
-import com.example.p3_aplicacionesnativas.ui.screens.TextFileViewerScreen
+import com.example.p3_aplicacionesnativas.ui.screens.*
 import com.example.p3_aplicacionesnativas.ui.theme.AppTheme
 import com.example.p3_aplicacionesnativas.ui.theme.AzulTheme
 import com.example.p3_aplicacionesnativas.ui.theme.GuindaTheme
@@ -53,18 +52,50 @@ private fun AppContent(onThemeChange: (AppTheme) -> Unit) {
             FileManagerScreen(
                 viewModel = viewModel,
                 onThemeChange = onThemeChange,
-                onFileClick = {
-                    val encodedPath = URLEncoder.encode(it.absolutePath, StandardCharsets.UTF_8.toString())
+                onFileClick = { file ->
+                    val encodedPath = URLEncoder.encode(file.absolutePath, StandardCharsets.UTF_8.toString())
                     navController.navigate("text_viewer/$encodedPath")
+                },
+                onImageClick = { file ->
+                    val encodedPath = URLEncoder.encode(file.absolutePath, StandardCharsets.UTF_8.toString())
+                    navController.navigate("image_viewer/$encodedPath")
+                },
+                onJsonXmlClick = { file ->
+                    val encodedPath = URLEncoder.encode(file.absolutePath, StandardCharsets.UTF_8.toString())
+                    navController.navigate("formatted_viewer/$encodedPath")
                 }
             )
         }
+
         composable(
             route = "text_viewer/{filePath}",
             arguments = listOf(navArgument("filePath") { type = NavType.StringType })
-        ) {
-            val filePath = it.arguments?.getString("filePath") ?: ""
+        ) { backStackEntry ->
+            val filePath = backStackEntry.arguments?.getString("filePath") ?: ""
             TextFileViewerScreen(
+                filePath = URLDecoder.decode(filePath, StandardCharsets.UTF_8.toString()),
+                viewModel = viewModel,
+                onNavigateUp = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "image_viewer/{filePath}",
+            arguments = listOf(navArgument("filePath") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val filePath = backStackEntry.arguments?.getString("filePath") ?: ""
+            ImageViewerScreen(
+                filePath = URLDecoder.decode(filePath, StandardCharsets.UTF_8.toString()),
+                onNavigateUp = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "formatted_viewer/{filePath}",
+            arguments = listOf(navArgument("filePath") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val filePath = backStackEntry.arguments?.getString("filePath") ?: ""
+            FormattedTextViewerScreen(
                 filePath = URLDecoder.decode(filePath, StandardCharsets.UTF_8.toString()),
                 viewModel = viewModel,
                 onNavigateUp = { navController.popBackStack() }
